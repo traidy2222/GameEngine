@@ -22,7 +22,7 @@ public:
     void setVec3(const std::string& name, const glm::vec3& value) const;
 
 private:
-    void checkCompileErrors(GLuint shader, std::string type);
+    void checkCompileErrors(GLuint shader, const std::string& type, const std::string& filename);
 };
 
 #endif // SHADER_H

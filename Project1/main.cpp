@@ -73,9 +73,15 @@ int main() {
     scene.AddMesh(cubeMesh);
 
     // Set up lights
-    scene.SetDirectionalLight(glm::vec3(-0.2f, -1.0f, -0.3f), glm::vec3(0.05f, 0.05f, 0.05f), glm::vec3(0.4f, 0.4f, 0.4f), glm::vec3(0.5f, 0.5f, 0.5f));
-    scene.AddPointLight(glm::vec3(0.7f, 0.2f, 2.0f), glm::vec3(0.05f, 0.05f, 0.05f), glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(1.0f, 1.0f, 1.0f), 1.0f, 0.09f, 0.032f);
-    scene.SetSpotLight(camera.GetPosition(), camera.GetFront(), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(1.0f, 1.0f, 1.0f), 1.0f, 0.09f, 0.032f, glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(15.0f)));
+
+    glm::vec3 lightPos(0.0f, 10.0f, 0.0f);
+    glm::vec3 lightDir(-0.2f, -1.0f, -0.3f);
+    glm::vec3 ambient(0.05f, 0.05f, 0.05f);
+    glm::vec3 diffuse(0.4f, 0.4f, 0.4f);
+    glm::vec3 specular(0.5f, 0.5f, 0.5f);
+    scene.SetDirectionalLight(lightPos, lightDir, ambient, diffuse, specular);
+    //scene.AddPointLight(glm::vec3(0.7f, 0.2f, 2.0f), glm::vec3(0.05f, 0.05f, 0.05f), glm::vec3(0.8f, 0.8f, 0.8f), glm::vec3(1.0f, 1.0f, 1.0f), 1.0f, 0.09f, 0.032f);
+    //scene.SetSpotLight(camera.GetPosition(), camera.GetFront(), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(1.0f, 1.0f, 1.0f), 1.0f, 0.09f, 0.032f, glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(15.0f)));
 
     // Ensure the correct winding order
     glFrontFace(GL_CCW);

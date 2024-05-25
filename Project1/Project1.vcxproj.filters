@@ -88,5 +88,20 @@
     <None Include="geometry_pass.frag">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="ssao.frag">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="ssao.vert">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="ssao_blur.frag">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="shadow.frag">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="shadow.vert">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

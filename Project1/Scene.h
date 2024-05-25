@@ -11,9 +11,9 @@
 class Scene {
 public:
     void AddMesh(const Mesh& mesh);
-    void SetDirectionalLight(const glm::vec3& direction, const glm::vec3& ambient, const glm::vec3& diffuse, const glm::vec3& specular);
+    void SetDirectionalLight(const glm::vec3& position, const glm::vec3& direction, const glm::vec3& ambient, const glm::vec3& diffuse, const glm::vec3& specular);
     void AddPointLight(const glm::vec3& position, const glm::vec3& ambient, const glm::vec3& diffuse, const glm::vec3& specular, float constant, float linear, float quadratic);
-    void SetSpotLight(const glm::vec3& position, const glm::vec3& direction, const glm::vec3& ambient, const glm::vec3& diffuse, const glm::vec3& specular, float constant, float linear, float quadratic, float cutOff, float outerCutOff);
+    void AddSpotLight(const glm::vec3& position, const glm::vec3& direction, const glm::vec3& ambient, const glm::vec3& diffuse, const glm::vec3& specular, float constant, float linear, float quadratic, float cutOff, float outerCutOff);
 
     const auto& GetMeshes() const { return meshes; }
     const auto& GetDirectionalLight() const { return directionalLight; }
@@ -23,6 +23,7 @@ public:
 private:
     std::vector<Mesh> meshes;
     struct DirectionalLight {
+        glm::vec3 position;   // Add position
         glm::vec3 direction;
         glm::vec3 ambient;
         glm::vec3 diffuse;

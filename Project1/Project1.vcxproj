@@ -154,6 +154,11 @@
     <None Include="geometry_pass.vert" />
     <None Include="lighting_pass.frag" />
     <None Include="lighting_pass.vert" />
+    <None Include="shadow.frag" />
+    <None Include="shadow.vert" />
+    <None Include="ssao.frag" />
+    <None Include="ssao.vert" />
+    <None Include="ssao_blur.frag" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
