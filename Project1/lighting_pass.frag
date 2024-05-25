@@ -52,7 +52,42 @@ uniform SpotLight spotLights[MAX_SPOT_LIGHTS];
 
 uniform vec3 viewPos;
 
-float ShadowCalculation(vec4 fragPosLightSpace, vec3 normal)
+vec3 poissonDisk[16] = vec3[](
+    vec3(-0.94201624, -0.39906216, 0.0), vec3(0.94558609, -0.76890725, 0.0),
+    vec3(-0.094184101, -0.92938870, 0.0), vec3(0.34495938, 0.29387760, 0.0),
+    vec3(-0.91588581, 0.45771432, 0.0), vec3(-0.81544232, -0.87912464, 0.0),
+    vec3(-0.38277543, 0.27676845, 0.0), vec3(0.97484398, 0.75648379, 0.0),
+    vec3(0.44323325, -0.97511554, 0.0), vec3(0.53742981, -0.47373420, 0.0),
+    vec3(-0.26496911, -0.41893023, 0.0), vec3(0.79197514, 0.19090188, 0.0),
+    vec3(-0.24188840, 0.99706507, 0.0), vec3(-0.81409955, 0.91437590, 0.0),
+    vec3(0.19984126, 0.78641367, 0.0), vec3(0.14383161, -0.14100790, 0.0)
+);
+
+float PenumbraSize(vec3 projCoords, float currentDepth, float lightSize)
+{
+    float searchRadius = 32.0 / 4096.0; // Assuming the shadow map resolution is 4096x4096
+    float blockerDepthSum = 0.0;
+    int blockerCount = 0;
+    
+    for (int i = 0; i < 16; ++i) {
+        vec2 offset = poissonDisk[i].xy * searchRadius;
+        float sampleDepth = texture(shadowMap, projCoords.xy + offset).r;
+        if (sampleDepth < currentDepth) {
+            blockerDepthSum += sampleDepth;
+            blockerCount++;
+        }
+    }
+
+    if (blockerCount > 0) {
+        float avgBlockerDepth = blockerDepthSum / blockerCount;
+        float penumbraSize = lightSize * (currentDepth - avgBlockerDepth) / avgBlockerDepth;
+        return penumbraSize;
+    }
+
+    return 0.0;
+}
+
+float ShadowCalculation(vec4 fragPosLightSpace, vec3 normal, float lightSize)
 {
     vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
     projCoords = projCoords * 0.5 + 0.5;
@@ -61,30 +96,17 @@ float ShadowCalculation(vec4 fragPosLightSpace, vec3 normal)
     float bias = max(0.005 * (1.0 - dot(normal, normalize(dirLight.direction))), 0.005);
     float shadow = 0.0;
 
-    int samples = 16;
-    float diskRadius = 1.0;
-    vec2 texelSize = 1.0 / textureSize(shadowMap, 0);
+    float penumbraSize = PenumbraSize(projCoords, currentDepth, lightSize);
+    penumbraSize = clamp(penumbraSize, 1.0 / 4096.0, 1.0);
 
-    vec2 poissonDisk[16] = vec2[](
-        vec2(-0.94201624, -0.39906216), vec2(0.94558609, -0.76890725),
-        vec2(-0.094184101, -0.92938870), vec2(0.34495938, 0.29387760),
-        vec2(-0.91588581, 0.45771432), vec2(-0.81544232, -0.87912464),
-        vec2(-0.38277543, 0.27676845), vec2(0.97484398, 0.75648379),
-        vec2(0.44323325, -0.97511554), vec2(0.53742981, -0.47373420),
-        vec2(-0.26496911, -0.41893023), vec2(0.79197514, 0.19090188),
-        vec2(-0.24188840, 0.99706507), vec2(-0.81409955, 0.91437590),
-        vec2(0.19984126, 0.78641367), vec2(0.14383161, -0.14100790)
-    );
-
-    for(int i = 0; i < samples; ++i)
-    {
-        vec2 offset = poissonDisk[i] * texelSize * diskRadius;
-        float pcfDepth = texture(shadowMap, projCoords.xy + offset).r;
-        shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;
+    for (int i = 0; i < 16; ++i) {
+        vec2 offset = poissonDisk[i].xy * penumbraSize;
+        float sampleDepth = texture(shadowMap, projCoords.xy + offset).r;
+        shadow += currentDepth - bias > sampleDepth ? 1.0 : 0.0;
     }
-    shadow /= float(samples);
+    shadow /= 16.0;
 
-    if(projCoords.z > 1.0)
+    if (projCoords.z > 1.0)
         shadow = 0.0;
 
     return shadow;
@@ -149,7 +171,7 @@ void main()
 
     vec3 viewDir = normalize(viewPos - fragPos);
     vec4 fragPosLightSpace = lightSpaceMatrix * vec4(fragPos, 1.0);
-    float shadow = ShadowCalculation(fragPosLightSpace, normal);
+    float shadow = ShadowCalculation(fragPosLightSpace, normal, 0.05); // Adjust the light size as needed
 
     vec3 result = vec3(0.0);
     result += CalculateDirectionalLight(dirLight, normal, viewDir, fragPos, albedo, spec, shadow);

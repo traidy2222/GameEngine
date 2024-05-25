@@ -1,5 +1,9 @@
 #include "window.h"
+#include "renderer.h"  // Include the renderer header
 #include <iostream>
+
+// Declare the external renderer pointer
+extern Renderer* renderer;
 
 Window::Window(const char* title, int width, int height)
     : title(title), width(width), height(height), window(nullptr) {
@@ -30,13 +34,17 @@ bool Window::init() {
     }
 
     glfwMakeContextCurrent(window);
-
+    glewExperimental = true;
     if (glewInit() != GLEW_OK) {
         std::cerr << "Failed to initialize GLEW." << std::endl;
         return false;
     }
 
     glViewport(0, 0, width, height);
+
+    // Set framebuffer size callback
+    glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
+
     return true;
 }
 
@@ -57,6 +65,13 @@ void Window::pollEvents() const {
     glfwPollEvents();
 }
 
-GLFWwindow* Window::getGLFWwindow() const { // Implement the getter function
+GLFWwindow* Window::getGLFWwindow() const {
     return window;
+}
+
+void Window::framebufferSizeCallback(GLFWwindow* window, int width, int height) {
+    glViewport(0, 0, width, height);
+    if (renderer) {
+        renderer->Resize(width, height);
+    }
 }

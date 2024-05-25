@@ -10,6 +10,10 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+
+// Define the global renderer pointer
+Renderer* renderer = nullptr;
+
 // Vertex data for a cube
 std::vector<Vertex> vertices = {
     {{-0.5f, -0.5f, -0.5f}, {0.0f, 0.0f, -1.0f}, {0.0f, 0.0f}},
@@ -59,9 +63,11 @@ int main() {
     // Enable depth test
     glEnable(GL_DEPTH_TEST);
 
-    Renderer renderer(800, 600);
+    // Create the renderer
+    renderer = new Renderer(800, 600);
     Camera camera(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, 0.0f);
     Scene scene;
+
 
     // Load textures
     Texture diffuseTexture("Assets/Textures/StoneFloor/BC.jpg", "texture_diffuse");
@@ -121,7 +127,7 @@ int main() {
         lastX = xpos;
         lastY = ypos;
 
-        renderer.RenderScene(0 /* Your VAO id */, 36 /* Vertex count */, camera, scene);
+        renderer->RenderScene(0 /* Your VAO id */, 36 /* Vertex count */, camera, scene);
 
         window.swapBuffers();
         window.pollEvents();

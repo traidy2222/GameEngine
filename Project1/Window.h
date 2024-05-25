@@ -12,17 +12,18 @@ public:
     bool shouldClose() const;
     void swapBuffers() const;
     void pollEvents() const;
-
-    GLFWwindow* getGLFWwindow() const; // Add this getter function
+    GLFWwindow* getGLFWwindow() const;
 
 private:
-    bool init();
-    void cleanup();
-
     const char* title;
     int width;
     int height;
     GLFWwindow* window;
+
+    bool init();
+    void cleanup();
+
+    static void framebufferSizeCallback(GLFWwindow* window, int width, int height);
 };
 
 #endif // WINDOW_H

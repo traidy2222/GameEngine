@@ -81,3 +81,26 @@ GLuint GBuffer::GetNormalTexture() {
 GLuint GBuffer::GetAlbedoTexture() {
     return albedoTexture;
 }
+
+void GBuffer::Resize(int newWidth, int newHeight) {
+    width = newWidth;
+    height = newHeight;
+
+    // Resize position texture
+    glBindTexture(GL_TEXTURE_2D, positionTexture);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, newWidth, newHeight, 0, GL_RGB, GL_FLOAT, nullptr);
+
+    // Resize normal texture
+    glBindTexture(GL_TEXTURE_2D, normalTexture);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, newWidth, newHeight, 0, GL_RGB, GL_FLOAT, nullptr);
+
+    // Resize albedo + specular texture
+    glBindTexture(GL_TEXTURE_2D, albedoTexture);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, newWidth, newHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+
+    // Resize depth render buffer
+    glBindRenderbuffer(GL_RENDERBUFFER, depthRenderBuffer);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, newWidth, newHeight);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}

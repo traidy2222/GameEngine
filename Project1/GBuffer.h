@@ -15,6 +15,8 @@ public:
     GLuint GetNormalTexture();
     GLuint GetAlbedoTexture();
 
+
+    void Resize(int newWidth, int newHeight); // Add this method
 private:
     GLuint fbo;
     GLuint positionTexture;
